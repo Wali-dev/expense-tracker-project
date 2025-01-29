@@ -14,11 +14,17 @@ import {
 import { useState } from "react";
 import AddExpenseForm from "./Components/AddExpenseForm";
 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 
 const Home = () => {
 
     const [addExpense, setAddEnpensehook] = useState(false);
-
 
     const handleAddButton = () => {
         setAddEnpensehook(!addExpense)
@@ -50,7 +56,14 @@ const Home = () => {
                     </div>
                     <div className="flex gap-2 items-center">
                         <div>Amount</div>
-                        <EllipsisVertical size={16} />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger> <EllipsisVertical size={16} /></DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem className="hover: cursor-pointer">Edit</DropdownMenuItem>
+                                <DropdownMenuItem className="hover: cursor-pointer">Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
                     </div>
                 </div>
 

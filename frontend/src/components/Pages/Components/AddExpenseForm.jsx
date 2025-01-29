@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 
+// eslint-disable-next-line react/prop-types, no-unused-vars
 const AddExpenseForm = ({ addExpense, setAddEnpensehook }) => {
     const form = useForm({
         defaultValues: {
@@ -138,7 +139,7 @@ const AddExpenseForm = ({ addExpense, setAddEnpensehook }) => {
                     <Button
                         type="button"
                         className="w-full bg-white text-black hover:bg-white hover:text-black"
-                        // onClick={props.handleAddButton}
+
                         onClick={() => setAddEnpensehook(false)}
                     >
                         Cancel
