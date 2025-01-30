@@ -22,6 +22,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import axios from 'axios';
 
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const AddExpenseForm = ({ addExpense, setAddEnpensehook }) => {
@@ -36,8 +37,23 @@ const AddExpenseForm = ({ addExpense, setAddEnpensehook }) => {
 
     const [selectedCategory, setSelectedCategory] = useState("Select Category");
 
-    const onSubmit = (data) => {
-        console.log("Form Data:", data);
+    const onSubmit = async (data) => {
+        const userId = "fba2b4b4-c969-4d15-a06f-93a0b3aaf3da";
+        try {
+            const requestBody = {
+                amount: data.amount,
+                category: data.category,
+                description: data.description,
+                date: data.date,
+            };
+
+            const response = await axios.post(`http://localhost:8000/api/v1/expense/${userId}`, requestBody);
+
+            console.log("Expense added:", response.data);
+        } catch (error) {
+
+            console.error("Error adding expense:", error);
+        }
     };
 
     return (

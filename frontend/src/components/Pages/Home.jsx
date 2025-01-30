@@ -1,7 +1,8 @@
-
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { EllipsisVertical } from "lucide-react";
 import { Button } from "../ui/button";
-
+import AddExpenseForm from "./Components/AddExpenseForm";
 import {
     Pagination,
     PaginationContent,
@@ -10,97 +11,133 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-} from "@/components/ui/pagination"
-import { useState } from "react";
-import AddExpenseForm from "./Components/AddExpenseForm";
-
+} from "@/components/ui/pagination";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
+} from "@/components/ui/dropdown-menu";
 
 const Home = () => {
-
     const [addExpense, setAddEnpensehook] = useState(false);
+    const [expenses, setExpenses] = useState([]);
+    const [page, setPage] = useState(1);
+    const limit = 5;
+    const userId = "fba2b4b4-c969-4d15-a06f-93a0b3aaf3da";
+
+    useEffect(() => {
+        fetchExpenses();
+    }, [page]);
+
+    const fetchExpenses = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/v1/expense/?page=${page}&limit=${limit}&id=${userId}`);
+            setExpenses(response.data.data);
+            console.log(response.data.data);
+        } catch (error) {
+            console.error("Error fetching expenses:", error);
+        }
+    };
 
     const handleAddButton = () => {
-        setAddEnpensehook(!addExpense)
-    }
-    return (
+        setAddEnpensehook(!addExpense);
+    };
 
-        (addExpense ? <AddExpenseForm addExpense={addExpense} setAddEnpensehook={setAddEnpensehook} /> : <div className="">
-            <div className="Add flex justify-between items-center">
-                <div>
-                    <div className="font-bold text-xl">Transactions</div>
-                    <div className="text-sm">Your all recent transactions will show up here</div>
-                </div>
-                <div>
+    const handleDelete = async (expenseId) => {
+        try {
+            await axios.delete(`http://localhost:8000/api/v1/expense/${expenseId}`);
+            setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== expenseId));
+            console.log("Expense deleted successfully");
+        } catch (error) {
+            console.error("Error deleting expense:", error);
+        }
+    };
+
+    return (
+        addExpense ? (
+            <AddExpenseForm addExpense={addExpense} setAddEnpensehook={setAddEnpensehook} />
+        ) : (
+            <div>
+                <div className="Add flex justify-between items-center">
+                    <div>
+                        <div className="font-bold text-xl">Transactions</div>
+                        <div className="text-sm">Your recent transactions will show up here</div>
+                    </div>
                     <Button onClick={handleAddButton}>+ Add</Button>
                 </div>
-            </div>
 
-            {/* today */}
-            <div className="mt-10">
-                <div className="flex justify-between pb-2 border-b">
-                    <div className="text-lg text-gray-500">Today</div>
-                    <div className="text-gray-500">Total amount</div>
-                </div>
-                <div className="flex justify-between border-b border-gray-300 py-5 ">
-                    <div className="flex sm:w-96 justify-between">
-                        <div>Name</div>
-                        <div>Category</div>
-                        <div>Date and Time</div>
+                <div className="mt-10 sm:min-h-72">
+                    <div className="flex justify-between pb-2 border-b">
+                        <div className="text-lg text-gray-500">Today</div>
+                        <div className="text-gray-500">Total amount</div>
                     </div>
-                    <div className="flex gap-2 items-center">
-                        <div>Amount</div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger> <EllipsisVertical size={16} /></DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem className="hover: cursor-pointer">Edit</DropdownMenuItem>
-                                <DropdownMenuItem className="hover: cursor-pointer">Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                    </div>
+                    {expenses.length > 0 ? (
+                        expenses.map((expense) => (
+                            <div key={expense.id} className="flex justify-between border-b border-gray-300 py-5 font-mono">
+                                <div className="flex sm:w-[500px] justify-between">
+                                    <div>{expense.description || "No Description"}</div>
+                                    <div>{expense.category || "Uncategorized"}</div>
+                                    <div>{new Date(expense.createdAt).toLocaleString()}</div>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                    <div>-${expense.amount}</div>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <EllipsisVertical size={16} />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem className="hover: cursor-pointer">Edit</DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="hover: cursor-pointer"
+                                                onClick={() => handleDelete(expense.id)}
+                                            >
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center text-gray-500 mt-4">No transactions found</div>
+                    )}
                 </div>
 
-
+                <div className="mt-10">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    href="#"
+                                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                />
+                            </PaginationItem>
+                            {[...Array(3)].map((_, index) => (
+                                <PaginationItem key={index}>
+                                    <PaginationLink
+                                        href="#"
+                                        isActive={page === index + 1}
+                                        onClick={() => setPage(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                                <PaginationEllipsis />
+                            </PaginationItem>
+                            <PaginationItem>
+                                <PaginationNext
+                                    href="#"
+                                    onClick={() => setPage((prev) => prev + 1)}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
             </div>
-
-
-            {/* pagination */}
-
-            <div className="mt-10">
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious href="#" />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#" isActive>
-                                2
-                            </PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationLink href="#">3</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                        <PaginationItem>
-                            <PaginationNext href="#" />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
-        </div>)
-
+        )
     );
 };
 

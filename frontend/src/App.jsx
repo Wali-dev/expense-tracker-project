@@ -13,11 +13,11 @@ function App() {
   return (
     <>
       <div className='max-w-[960px] mx-auto '>
-        <Navbar />
+        {/* <Navbar /> */}
         <Home />
         {/* <SignIn /> */}
         {/* <SignUp /> */}
-        {/* <Report /> */}
+        <Report />
       </div>
 
     </>

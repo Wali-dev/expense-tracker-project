@@ -102,3 +102,26 @@ module.exports.getExpenseService = async (userId, page, limit) => {
         };
     }
 };
+module.exports.deleteExpenseService = async (expenseId) => {
+    console.log(expenseId)
+    try {
+
+        const expense = await Expense.findOneAndDelete({ id: expenseId });
+
+        if (!expense) {
+            return {
+                success: false,
+                message: "Expense not found"
+            };
+        }
+        return {
+            success: true,
+            message: "Expense deleted successfully"
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: error.message
+        };
+    }
+};

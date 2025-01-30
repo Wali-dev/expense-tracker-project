@@ -42,8 +42,7 @@ const deleteExpense = async (req, res) => {
 }
 
 const getExpense = async (req, res) => {
-    const { page, limit } = req.query;
-    const { id } = req.body;
+    const { page, limit, id } = req.query;
     const response = await getExpenseService(id, page, limit);
     if (response.success) {
         sendResponse(res, 200, true, "Expenses fetched successfully", response.data)

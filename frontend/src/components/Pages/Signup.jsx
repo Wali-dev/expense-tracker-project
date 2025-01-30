@@ -4,20 +4,53 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import axios from 'axios';
+import { useToast } from "@/hooks/use-toast"
+import { useNavigate } from 'react-router-dom';
+
+
 
 const SignUp = () => {
+    const { toast } = useToast()
+    const navigate = useNavigate();
+
+
     const [showPassword, setShowPassword] = useState(false);
     const form = useForm({
         defaultValues: {
-            firstName: '',
-            lastName: '',
+            firstname: '',
+            lastname: '',
             email: '',
             password: '',
         },
     });
 
-    const onSubmit = (data) => {
-        console.log('Sign Up Data:', data);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const onSubmit = async (data) => {
+        try {
+            setIsLoading(true);
+            setError('');
+
+            await axios.post('http://localhost:8000/api/v1/users', data);
+
+            toast({
+                title: "Success!",
+                description: "Your account has been created, sign in.",
+                duration: 3000,
+            });
+
+            setTimeout(() => {
+                navigate('/signin');
+
+            }, 1000);
+
+        } catch (err) {
+            setError(err.response?.data?.message || 'An error occurred during sign up');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -26,11 +59,16 @@ const SignUp = () => {
             <p className="text-center text-sm text-gray-500 mt-2">
                 &quot;A good financial future starts with smart decisions today&quot;
             </p>
+            {error && (
+                <p className="text-red-500 text-sm text-center mt-2">
+                    {error}
+                </p>
+            )}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-6">
                     <FormField
                         control={form.control}
-                        name="firstName"
+                        name="firstname"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>First Name</FormLabel>
@@ -44,7 +82,7 @@ const SignUp = () => {
 
                     <FormField
                         control={form.control}
-                        name="lastName"
+                        name="lastname"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Last Name</FormLabel>
@@ -106,8 +144,8 @@ const SignUp = () => {
                         )}
                     />
 
-                    <Button type="submit" className="w-full">
-                        Sign Up
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? 'Signing Up...' : 'Sign Up'}
                     </Button>
                 </form>
             </Form>
