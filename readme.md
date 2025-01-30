@@ -226,7 +226,7 @@ Common error scenarios:
 
 
 
-# Expense Management Application Frontend
+# Application Frontend
 
 A modern web application built with React and Vite for managing personal expenses. The application provides features for tracking expenses, viewing reports, and managing user accounts.
 
