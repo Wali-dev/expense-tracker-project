@@ -75,23 +75,25 @@ module.exports.updateExpenseService = async (id, updatedExpenseData) => {
     }
 };
 
-
-module.exports.deleteExpenseService = async (expenseId) => {
-    const existingExpense = await Expense.findOne({ id: expenseId });
-
-    if (!existingExpense) {
-        return {
-            success: false,
-            message: 'Expense not found'
-        };
-    }
-
+module.exports.getExpenseService = async (userId, page, limit) => {
+    const skip = (page - 1) * limit;
     try {
-        await Expense.findOneAndDelete({ id: expenseId });
+        const user = await User.findOne({ id: userId }).populate({
+            path: "expenses",
+            options: { skip: parseInt(skip), limit: parseInt(limit) }
+        });
+
+        if (!user) {
+            return {
+                success: false,
+                message: "User not found"
+            };
+        }
 
         return {
             success: true,
-            message: 'Expense deleted successfully'
+            data: user.expenses,
+            message: "Expenses retrieved successfully"
         };
     } catch (error) {
         return {

@@ -85,6 +85,29 @@ module.exports.handleSignIn = async (identifier, password) => {
         };
     }
 };
+module.exports.getProfile = async (id) => {
+    try {
+        const user = await User.findOne({ id });
+
+        if (!user) {
+            return {
+                success: false,
+                message: "User not found"
+            };
+        }
+
+        return {
+            success: true,
+            data: user,
+            message: "User retrieved successfully"
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: error.message
+        };
+    }
+};
 
 module.exports.handleSignOut = (res) => {
     try {

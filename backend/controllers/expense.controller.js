@@ -1,4 +1,4 @@
-const { createExpenseService, updateExpenseService, deleteExpenseService } = require("../services/expensive.service");
+const { createExpenseService, updateExpenseService, deleteExpenseService, getExpenseService } = require("../services/expensive.service");
 const { } = require("../services/user.service");
 const sendResponse = require("../utils/sendResponse")
 
@@ -41,12 +41,25 @@ const deleteExpense = async (req, res) => {
     }
 }
 
+const getExpense = async (req, res) => {
+    const { page, limit } = req.query;
+    const { id } = req.body;
+    const response = await getExpenseService(id, page, limit);
+    if (response.success) {
+        sendResponse(res, 200, true, "Expenses fetched successfully", response.data)
+    }
+    else {
+        sendResponse(res, 400, false, response.message)
+    }
+}
+
 
 
 module.exports = {
 
     createExpense,
     updateExpense,
-    deleteExpense
+    deleteExpense,
+    getExpense
 
 }
