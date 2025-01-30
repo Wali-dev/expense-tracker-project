@@ -5,14 +5,15 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
     return (
         <div className="flex justify-between items-center">
             <Blocks />
             <div className="flex justify-between sm:gap-6">
-                <div className="flex items-center gap-1 hover:bg-slate-100 hover:cursor-pointer rounded p-2"><HouseWifi size={17} />Home</div>
-                <div className="flex items-center gap-1 hover:bg-slate-100 hover:cursor-pointer rounded p-2"><ChartLine size={17} />Insights</div>
+                <Link to="/home"><div className="flex items-center gap-1 hover:bg-slate-100 hover:cursor-pointer rounded p-2" ><HouseWifi size={17} />Home</div></Link>
+                <Link to="/home/report"> <div className="flex items-center gap-1 hover:bg-slate-100 hover:cursor-pointer rounded p-2"><ChartLine size={17} />Insights</div></Link>
 
             </div>
 

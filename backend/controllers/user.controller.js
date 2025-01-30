@@ -1,9 +1,10 @@
-const { createUserService, updateUserService, handleSignIn, getprofile } = require("../services/user.service");
+const { createUserService, updateUserService, handleSignIn, getProfile } = require("../services/user.service");
 const sendResponse = require("../utils/sendResponse")
 
 const getSingleProfile = async (req, res) => {
-    const { id } = req.params;
-    const response = await getprofile(id);
+    const id = req.user.id;
+
+    const response = await getProfile(id);
     if (response) {
         sendResponse(res, 200, true, "User fetched succesfully", response)
     }

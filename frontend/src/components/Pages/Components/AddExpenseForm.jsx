@@ -24,8 +24,11 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import axios from 'axios';
 
+
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const AddExpenseForm = ({ addExpense, setAddEnpensehook }) => {
+
+
     const form = useForm({
         defaultValues: {
             amount: "",
@@ -50,6 +53,13 @@ const AddExpenseForm = ({ addExpense, setAddEnpensehook }) => {
             const response = await axios.post(`http://localhost:8000/api/v1/expense/${userId}`, requestBody);
 
             console.log("Expense added:", response.data);
+
+            if (response.data.success) {
+                window.location.reload();
+            } else {
+                console.error('Failed to add expense');
+            }
+
         } catch (error) {
 
             console.error("Error adding expense:", error);

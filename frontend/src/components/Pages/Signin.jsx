@@ -4,10 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SignIn = () => {
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null);
+
     const form = useForm({
         defaultValues: {
             identifier: '',
@@ -15,8 +23,24 @@ const SignIn = () => {
         },
     });
 
-    const onSubmit = (data) => {
-        console.log('Sign In Data:', data);
+    const onSubmit = async (data) => {
+        setIsLoading(true);
+        setErrorMessage(null);
+
+        try {
+            const response = await axios.post(`http://localhost:8000/api/v1/users/log-in`, {
+                identifier: data.identifier,
+                password: data.password
+            });
+            const token = response.data.data.accessToken
+            login(token);
+            localStorage.setItem('token', token);
+            navigate('/home');
+        } catch (error) {
+            setErrorMessage(error.response?.data?.message || "An error occurred during sign in");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -25,6 +49,13 @@ const SignIn = () => {
             <p className="text-center text-sm text-gray-500 mt-2">
                 &quot;Managing your expenses wisely is the key to a secure future&quot;
             </p>
+
+            {errorMessage && (
+                <div className="text-red-500 text-sm text-center mt-2">
+                    {errorMessage}
+                </div>
+            )}
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-6">
                     <FormField
@@ -34,7 +65,11 @@ const SignIn = () => {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Enter your email" {...field} />
+                                    <Input
+                                        placeholder="Enter your email"
+                                        {...field}
+                                        disabled={isLoading}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -53,6 +88,7 @@ const SignIn = () => {
                                             type={showPassword ? 'text' : 'password'}
                                             placeholder="Enter your password"
                                             {...field}
+                                            disabled={isLoading}
                                         />
                                         <button
                                             type="button"
@@ -72,8 +108,8 @@ const SignIn = () => {
                         )}
                     />
 
-                    <Button type="submit" className="w-full">
-                        Sign In
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? 'Signing in...' : 'Sign In'}
                     </Button>
                 </form>
             </Form>

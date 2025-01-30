@@ -85,6 +85,7 @@ module.exports.handleSignIn = async (identifier, password) => {
         };
     }
 };
+
 module.exports.getProfile = async (id) => {
     try {
         const user = await User.findOne({ id });

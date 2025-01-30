@@ -3,6 +3,7 @@ import axios from "axios";
 import { EllipsisVertical } from "lucide-react";
 import { Button } from "../ui/button";
 import AddExpenseForm from "./Components/AddExpenseForm";
+import { useAuth } from '@/contexts/AuthContext';
 import {
     Pagination,
     PaginationContent,
@@ -24,21 +25,46 @@ const Home = () => {
     const [expenses, setExpenses] = useState([]);
     const [page, setPage] = useState(1);
     const limit = 5;
-    const userId = "fba2b4b4-c969-4d15-a06f-93a0b3aaf3da";
+    const { setUser } = useAuth();
 
-    useEffect(() => {
-        fetchExpenses();
-    }, [page]);
+    const [userId, setUserId] = useState(null);
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/v1/users`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            const userData = response.data.data.data;
+            setUser(userData);
+            setUserId(userData.id);
+        } catch (error) {
+            console.error("Error fetching user:", error);
+        }
+    };
 
     const fetchExpenses = async () => {
+        if (!userId) return;
         try {
-            const response = await axios.get(`http://localhost:8000/api/v1/expense/?page=${page}&limit=${limit}&id=${userId}`);
+            const response = await axios.get(
+                `http://localhost:8000/api/v1/expense/?page=${page}&limit=${limit}&id=${userId}`
+            );
             setExpenses(response.data.data);
-            console.log(response.data.data);
         } catch (error) {
             console.error("Error fetching expenses:", error);
         }
     };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            fetchExpenses();
+        }
+    }, [userId, page]);
 
     const handleAddButton = () => {
         setAddEnpensehook(!addExpense);

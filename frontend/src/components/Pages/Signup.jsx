@@ -42,7 +42,7 @@ const SignUp = () => {
             });
 
             setTimeout(() => {
-                navigate('/signin');
+                navigate('/sign-in');
 
             }, 1000);
 
